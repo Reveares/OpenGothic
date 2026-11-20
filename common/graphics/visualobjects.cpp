@@ -414,9 +414,12 @@ void VisualObjects::startMMAnim(size_t i, std::string_view animName, float inten
     return;
     }
 
+  // take an expired slot before a running one, then the oldest
+  auto order = [&](const MorphAnim& a) { return std::make_pair(a.timeUntil>=scene.tickCount, a.timeStart); };
+
   size_t nId = 0;
   for(size_t i=0; i<Resources::MAX_MORPH_LAYERS; ++i) {
-    if(obj.morphAnim[nId].timeStart<=obj.morphAnim[i].timeStart)
+    if(order(obj.morphAnim[nId])<=order(obj.morphAnim[i]))
       continue;
     nId = i;
     }
